@@ -1,7 +1,7 @@
 // Supabase配置
 // 注意：您需要使用自己的Supabase项目URL和API密钥
-const SUPABASE_URL = 'https://your-project-url.supabase.co';
-const SUPABASE_KEY = 'your-supabase-anon-key';
+const SUPABASE_URL = 'https://ymwnsngznsuiwvblhcyo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inltd25zbmd6bnN1aXd2YmxoY3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ5NDU3MzEsImV4cCI6MjA2MDUyMTczMX0.KmJN9c72Ic7uscQsxtywPP9xlMqEbHzGou_UPy6jr2k';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 获取DOM元素
