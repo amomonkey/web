@@ -42,11 +42,13 @@ let spinTimeTotal = 0;
 // 从存储中加载数据（本地或Supabase）
 function loadFromStorage() {
     // 如果用户已登录，数据会通过Supabase加载
-    if (currentUser) {
+    if (typeof currentUser !== 'undefined' && currentUser) {
+        console.log('用户已登录，使用Supabase数据');
         return;
     }
     
     // 否则从本地存储加载
+    console.log('用户未登录，使用本地存储');
     const savedOptions = localStorage.getItem('wheelOptions');
     const savedHistory = localStorage.getItem('wheelHistory');
     
@@ -64,12 +66,18 @@ function loadFromStorage() {
 // 保存数据到存储（本地或Supabase）
 function saveToStorage() {
     // 如果用户已登录，保存到Supabase
-    if (currentUser) {
-        saveUserData();
+    if (typeof currentUser !== 'undefined' && currentUser) {
+        console.log('保存到Supabase');
+        if (typeof saveUserData === 'function') {
+            saveUserData();
+        } else {
+            console.error('saveUserData函数未定义');
+        }
         return;
     }
     
     // 否则保存到本地存储
+    console.log('保存到本地存储');
     localStorage.setItem('wheelOptions', JSON.stringify(options));
     
     const historyItems = Array.from(historyList.children).map(li => li.textContent);
@@ -260,10 +268,16 @@ function renderHistory(historyItems) {
 function clearHistory() {
     historyList.innerHTML = '';
     
-    if (currentUser) {
+    if (typeof currentUser !== 'undefined' && currentUser) {
         // 如果已登录，更新Supabase数据
-        clearUserHistory();
+        console.log('清除Supabase历史');
+        if (typeof clearUserHistory === 'function') {
+            clearUserHistory();
+        } else {
+            console.error('clearUserHistory函数未定义');
+        }
     } else {
+        console.log('清除本地历史');
         localStorage.removeItem('wheelHistory');
     }
 }

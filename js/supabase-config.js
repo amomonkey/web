@@ -2,7 +2,7 @@
 // 注意：您需要使用自己的Supabase项目URL和API密钥
 const SUPABASE_URL = 'https://ymwnsngznsuiwvblhcyo.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inltd25zbmd6bnN1aXd2YmxoY3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ5NDU3MzEsImV4cCI6MjA2MDUyMTczMX0.KmJN9c72Ic7uscQsxtywPP9xlMqEbHzGou_UPy6jr2k';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 获取DOM元素
 const userEmailInput = document.getElementById('user-email');
@@ -46,20 +46,29 @@ async function signUp() {
     
     try {
         showMessage('注册中...', 'info');
+        console.log('开始注册流程', { email });
+        
         const { data, error } = await supabase.auth.signUp({ 
             email, 
-            password 
+            password,
+            options: {
+                emailRedirectTo: window.location.origin
+            }
         });
+        
+        console.log('注册结果', { data, error });
         
         if (error) throw error;
         
-        showMessage('注册成功，请检查邮箱验证', 'success');
+        showMessage('注册成功！请查收确认邮件，并完成邮箱验证后登录。', 'success');
         
         // 初始化用户数据
         if (data.user) {
+            console.log('初始化用户数据', data.user.id);
             await initUserData(data.user.id);
         }
     } catch (error) {
+        console.error('注册错误:', error);
         showMessage(`注册失败: ${error.message}`, 'error');
     }
 }
@@ -119,15 +128,20 @@ async function logOut() {
 // 初始化用户数据
 async function initUserData(userId) {
     try {
+        console.log('创建用户数据记录', userId);
         const { error } = await supabase
             .from('user_data')
             .insert([{ 
                 user_id: userId, 
-                options: ['选项1', '选项2', '选项3', '选项4'],
-                history: []
+                options: JSON.stringify(['选项1', '选项2', '选项3', '选项4']),
+                history: JSON.stringify([])
             }]);
             
-        if (error) throw error;
+        if (error) {
+            console.error('初始化数据错误', error);
+            throw error;
+        }
+        console.log('用户数据初始化成功');
     } catch (error) {
         console.error('初始化用户数据错误:', error.message);
     }
@@ -138,6 +152,7 @@ async function loadUserData() {
     if (!currentUser) return;
     
     try {
+        console.log('开始加载用户数据', currentUser.id);
         const { data, error } = await supabase
             .from('user_data')
             .select('options, history')
@@ -147,27 +162,43 @@ async function loadUserData() {
         if (error) throw error;
         
         if (data) {
+            console.log('用户数据加载成功', data);
             // 加载选项
-            if (data.options && data.options.length > 0) {
-                options = data.options;
-                renderOptions();
+            if (data.options) {
+                try {
+                    options = typeof data.options === 'string' 
+                        ? JSON.parse(data.options) 
+                        : data.options;
+                    renderOptions();
+                } catch (e) {
+                    console.error('解析选项错误', e);
+                }
             }
             
             // 加载历史记录
-            if (data.history && data.history.length > 0) {
-                renderHistory(data.history);
+            if (data.history) {
+                try {
+                    const history = typeof data.history === 'string'
+                        ? JSON.parse(data.history)
+                        : data.history;
+                    renderHistory(history);
+                } catch (e) {
+                    console.error('解析历史记录错误', e);
+                }
             }
             
             // 重绘轮盘
             drawWheel();
         } else {
             // 如果没有找到数据，初始化用户数据
+            console.log('未找到用户数据，初始化数据');
             await initUserData(currentUser.id);
         }
     } catch (error) {
-        console.error('加载用户数据错误:', error.message);
+        console.error('加载用户数据错误:', error);
         // 如果是没有找到数据的错误，初始化用户数据
         if (error.code === 'PGRST116') {
+            console.log('PGRST116错误，初始化用户数据');
             await initUserData(currentUser.id);
         }
     }
@@ -180,17 +211,19 @@ async function saveUserData() {
     const historyItems = Array.from(historyList.children).map(li => li.textContent);
     
     try {
+        console.log('保存用户数据', { options, historyCount: historyItems.length });
         const { error } = await supabase
             .from('user_data')
             .update({ 
-                options: options,
-                history: historyItems
+                options: JSON.stringify(options),
+                history: JSON.stringify(historyItems)
             })
             .eq('user_id', currentUser.id);
             
         if (error) throw error;
+        console.log('用户数据保存成功');
     } catch (error) {
-        console.error('保存用户数据错误:', error.message);
+        console.error('保存用户数据错误:', error);
     }
 }
 
@@ -199,14 +232,16 @@ async function clearUserHistory() {
     if (!currentUser) return;
     
     try {
+        console.log('清除历史记录');
         const { error } = await supabase
             .from('user_data')
-            .update({ history: [] })
+            .update({ history: JSON.stringify([]) })
             .eq('user_id', currentUser.id);
             
         if (error) throw error;
+        console.log('历史记录清除成功');
     } catch (error) {
-        console.error('清除历史记录错误:', error.message);
+        console.error('清除历史记录错误:', error);
     }
 }
 
