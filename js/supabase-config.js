@@ -274,5 +274,38 @@ loginBtn.addEventListener('click', logIn);
 signupBtn.addEventListener('click', signUp);
 logoutBtn.addEventListener('click', logOut);
 
+// 处理URL中的认证参数
+async function handleAuthRedirect() {
+    const urlParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = urlParams.get('access_token');
+    const refreshToken = urlParams.get('refresh_token');
+    const tokenType = urlParams.get('token_type');
+    
+    if (accessToken && refreshToken && tokenType) {
+        try {
+            const { data, error } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+            });
+            
+            if (error) throw error;
+            
+            currentUser = data.user;
+            updateUserInterface(true);
+            loadUserData();
+            showMessage('邮箱验证成功！', 'success');
+            
+            // 清除URL中的认证参数
+            window.location.hash = '';
+        } catch (error) {
+            console.error('认证错误:', error);
+            showMessage(`认证失败: ${error.message}`, 'error');
+        }
+    }
+}
+
 // 检查初始会话
-document.addEventListener('DOMContentLoaded', checkSession); 
+document.addEventListener('DOMContentLoaded', () => {
+    checkSession();
+    handleAuthRedirect();
+}); 
