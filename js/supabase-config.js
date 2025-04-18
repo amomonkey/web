@@ -129,6 +129,23 @@ async function logOut() {
 async function initUserData(userId) {
     try {
         console.log('创建用户数据记录', userId);
+        
+        // 等待短暂时间，确保身份验证完成
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // 先检查用户数据是否已存在
+        const { data: existingData, error: checkError } = await supabase
+            .from('user_data')
+            .select('id')
+            .eq('user_id', userId)
+            .maybeSingle();
+            
+        if (!checkError && existingData) {
+            console.log('用户数据已存在，跳过创建');
+            return;
+        }
+        
+        // 创建新的用户数据
         const { error } = await supabase
             .from('user_data')
             .insert([{ 
@@ -143,7 +160,7 @@ async function initUserData(userId) {
         }
         console.log('用户数据初始化成功');
     } catch (error) {
-        console.error('初始化用户数据错误:', error.message);
+        console.error('初始化用户数据错误:', error);
     }
 }
 
