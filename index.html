@@ -3,35 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的Web项目</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .container {
-            text-align: center;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <title>决策轮盘</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>欢迎来到我的Web项目</h1>
-        <p>这是一个简单的演示页面</p>
-        <button id="clickMe">点击我</button>
-        <p id="message"></p>
+        <h1>决策轮盘</h1>
+        <p>当你无法做决定时，让轮盘来帮你</p>
+        
+        <div class="wheel-container">
+            <canvas id="wheel" width="400" height="400"></canvas>
+            <div id="spinner"></div>
+            <button id="spin-btn">旋转!</button>
+        </div>
+        
+        <div class="options-container">
+            <h2>选项管理</h2>
+            <div class="option-inputs">
+                <input type="text" id="new-option" placeholder="添加新选项...">
+                <button id="add-option">添加</button>
+            </div>
+            <div class="options-list">
+                <h3>当前选项</h3>
+                <ul id="options"></ul>
+            </div>
+        </div>
+        
+        <div class="history-container">
+            <h2>历史结果</h2>
+            <ul id="history"></ul>
+            <button id="clear-history">清除历史</button>
+        </div>
     </div>
-    <script src="src/app.js"></script>
+    
+    <script src="js/wheel.js"></script>
 </body>
 </html>
