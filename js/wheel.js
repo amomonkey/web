@@ -39,8 +39,14 @@ let spinAngleStart = 0;
 let spinTime = 0;
 let spinTimeTotal = 0;
 
-// 从本地存储加载数据
-function loadFromLocalStorage() {
+// 从存储中加载数据（本地或Supabase）
+function loadFromStorage() {
+    // 如果用户已登录，数据会通过Supabase加载
+    if (currentUser) {
+        return;
+    }
+    
+    // 否则从本地存储加载
     const savedOptions = localStorage.getItem('wheelOptions');
     const savedHistory = localStorage.getItem('wheelHistory');
     
@@ -55,8 +61,15 @@ function loadFromLocalStorage() {
     }
 }
 
-// 保存数据到本地存储
-function saveToLocalStorage() {
+// 保存数据到存储（本地或Supabase）
+function saveToStorage() {
+    // 如果用户已登录，保存到Supabase
+    if (currentUser) {
+        saveUserData();
+        return;
+    }
+    
+    // 否则保存到本地存储
     localStorage.setItem('wheelOptions', JSON.stringify(options));
     
     const historyItems = Array.from(historyList.children).map(li => li.textContent);
@@ -163,7 +176,7 @@ function stopRotateWheel() {
     addToHistory(result);
     
     // 保存数据
-    saveToLocalStorage();
+    saveToStorage();
 }
 
 // 开始旋转
@@ -193,7 +206,7 @@ function addOption() {
         newOptionInput.value = '';
         renderOptions();
         drawWheel();
-        saveToLocalStorage();
+        saveToStorage();
     }
 }
 
@@ -202,7 +215,7 @@ function deleteOption(index) {
     options.splice(index, 1);
     renderOptions();
     drawWheel();
-    saveToLocalStorage();
+    saveToStorage();
 }
 
 // 渲染选项列表
@@ -246,13 +259,19 @@ function renderHistory(historyItems) {
 // 清除历史记录
 function clearHistory() {
     historyList.innerHTML = '';
-    localStorage.removeItem('wheelHistory');
+    
+    if (currentUser) {
+        // 如果已登录，更新Supabase数据
+        clearUserHistory();
+    } else {
+        localStorage.removeItem('wheelHistory');
+    }
 }
 
 // 初始化
 function init() {
-    // 加载本地存储数据
-    loadFromLocalStorage();
+    // 加载存储数据
+    loadFromStorage();
     
     // 初始绘制轮盘
     drawWheel();

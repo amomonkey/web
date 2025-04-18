@@ -6,7 +6,8 @@
 
 - 可视化的彩色轮盘界面
 - 添加、删除自定义选项
-- 保存选项到本地存储
+- 支持云端数据存储 (Supabase)
+- 用户账户系统，保存个人选项和历史
 - 记录历史决策结果
 - 响应式设计，支持各种设备
 
@@ -16,12 +17,27 @@
 2. 点击"旋转"按钮开始随机选择
 3. 轮盘停止后，将显示随机选中的结果
 4. 结果会自动保存到历史记录中
+5. 可选择注册账户，跨设备同步数据
 
 ## 技术实现
 
 - 原生JavaScript实现轮盘动画
 - 使用Canvas绘制轮盘
-- localStorage存储选项和历史记录
+- Supabase提供云端数据存储和用户认证
+- 在未登录状态使用localStorage作为备用存储
+
+## Supabase配置
+
+使用此应用前，您需要：
+
+1. 创建Supabase账户和项目（https://supabase.com）
+2. 在Supabase中创建`user_data`表，包含以下字段：
+   - `id`: uuid (主键)
+   - `user_id`: uuid (外键，关联auth.users表)
+   - `options`: jsonb[]
+   - `history`: jsonb[]
+3. 设置适当的行级安全策略(RLS)
+4. 更新`js/supabase-config.js`文件中的项目URL和API密钥
 
 ## 本地运行
 

@@ -34,8 +34,30 @@
             <ul id="history"></ul>
             <button id="clear-history">清除历史</button>
         </div>
+        
+        <div class="user-container">
+            <h2>用户设置</h2>
+            <div id="auth-container">
+                <div id="login-container">
+                    <input type="email" id="user-email" placeholder="请输入邮箱" required>
+                    <input type="password" id="user-password" placeholder="请输入密码" required>
+                    <button id="login-btn">登录</button>
+                    <button id="signup-btn">注册</button>
+                </div>
+                <div id="user-info" style="display: none;">
+                    <p>当前用户: <span id="current-user"></span></p>
+                    <button id="logout-btn">退出登录</button>
+                </div>
+            </div>
+            <p id="auth-message" class="message"></p>
+        </div>
     </div>
     
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    
+    <!-- 应用脚本 -->
+    <script src="js/supabase-config.js"></script>
     <script src="js/wheel.js"></script>
 </body>
 </html>
